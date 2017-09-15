@@ -1,0 +1,41 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+
+
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+    <script>
+        require = undefined;
+        define = undefined;
+    </script>
+
+</metal:scripts>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+
+    <h3><span tal:content="context/experimental_title"></span>: <span tal:content="string:${context/group_num}班"></span></h3>
+
+    <div tal:content="context/data"></div>
+
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>

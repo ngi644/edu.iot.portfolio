@@ -1,0 +1,97 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+    <script>
+        require = undefined;
+        define = undefined;
+    </script>
+
+    <div tal:replace="structure view/get_dataset"><!----></div>
+
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+    <script type="text/javascript">
+      google.charts.load('current', {'packages':['corechart']});
+      google.charts.setOnLoadCallback(drawChart);
+
+      function drawChart() {
+        var data = google.visualization.arrayToDataTable(data_set);
+
+        var options = {
+            title: document.getElementById('ex_title').textContent,
+            legend: { position: 'right' },
+            pointSize: 5,
+            hAxis: {
+              title: '時間(秒)'
+            },
+            vAxis: {
+              title: '温度(c)',
+                maxValue: 110,
+                minValue: 0
+            }
+
+        };
+
+        var chart = new google.visualization.LineChart(document.getElementById('visualization'));
+
+        chart.draw(data, options);
+        document.getElementById('png').outerHTML = '<a href="' + chart.getImageURI() + '" target="_blank"><i class="fa fa-file-image-o" aria-hidden="true"></i>Printable version</a>';
+      }
+    </script>
+
+    <script src="https://use.fontawesome.com/539b5348b3.js"></script>
+
+</metal:scripts>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+    <a tal:attributes="href context/absolute_url"><i class="fa fa-arrow-left" aria-hidden="true"></i>実験Top</a>
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h3 tal:content="string:${view/get_experimental_title}" id="ex_title"></h3>
+        </div>
+    </div>
+
+
+    <div id="visualization" style="width: 100%; height: 650px"></div>
+    <div id='png'></div>
+
+
+    <div class="visualClear"><!-- --></div>
+
+    <span tal:replace="structure context/@@authenticator/authenticator"/>
+
+
+    <script type="text/javascript">
+
+
+        let container = document.getElementById('visualization');
+
+
+    </script>
+
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>

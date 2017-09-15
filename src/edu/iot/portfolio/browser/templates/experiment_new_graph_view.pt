@@ -1,0 +1,255 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.0/vis.min.css" />
+
+    <style type="text/css">
+        body, html {
+            font-family: sans-serif;
+        }
+
+        .custom-style1 {
+            fill: #f2ea00;
+            fill-opacity: 0;
+            stroke-width: 2px;
+            stroke: #b3ab00;
+        }
+
+        .custom-style2 {
+            fill: #00b72b;
+            fill-opacity: 0;
+            stroke-width: 2px;
+            stroke: #00b72b;
+        }
+
+        .custom-style3 {
+            fill: #00a0f2;
+            fill-opacity: 0;
+            stroke-width: 2px;
+            stroke: #0016dc;
+        }
+    </style>
+
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+    <script>
+        require = undefined;
+        define = undefined;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.0/vis.min.js"></script>
+    <script src="https://cdn.mlkcca.com/v0.6.0/milkcocoa.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://use.fontawesome.com/539b5348b3.js"></script>
+
+</metal:scripts>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+    <a tal:attributes="href context/absolute_url"><i class="fa fa-arrow-left" aria-hidden="true"></i>実験Top</a>
+
+    <div class="row">
+        <div class="col-xs-6">
+            <h4>リアルタイム表示 [<span id="device_title"></span>]</h4>
+        </div>
+        <div class="col-xs-6">
+            <ul>
+                <li >
+                    実験名: <span tal:content="view/get_experimental_title" id="experimental_title"></span>
+                </li>
+                <li>
+                    班: <span tal:content="view/get_group_num" id="group_num"></span>班
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-xs-4">
+            <button id="btnRecord">計測開始</button>
+        </div>
+        <div class="col-xs-4">
+            <p id="rec_status">記録待機中</p>
+            <p id ="rec_num" style="color:red; font-size: 14px;"></p>
+        </div>
+        <div class="col-xs-4">
+            <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal" href="#modal_save" data-pat-plone-modal="width: 70%"><i class="fa fa-floppy-o" aria-hidden="true"><span>保存</span></a>
+        </div>
+    </div>
+
+    <div id="modal_save" style="display: none;">
+        <h1>記録したデータを保存します</h1>
+        <p>よろしければ「OK」ボタンを押してください．</p>
+        <p><button id="btnSave" onclick="save()">OK</button></p>
+    </div>
+
+    <div id="visualization"></div>
+
+    <div class="visualClear"><!-- --></div>
+
+    <span tal:replace="structure context/@@authenticator/authenticator"/>
+
+    <div tal:replace="structure view/get_param"><!----></div>
+
+    <script type="text/javascript">
+
+        document.querySelector('#device_title').textContent = device_id;
+
+        let container = document.getElementById('visualization');
+        let record_btn = document.getElementById('btnRecord');
+        let save_btn = document.getElementById('btnSave');
+        let rec_status_info = document.getElementById('rec_status');
+
+        let isRecord = false;
+
+        function record(){
+            if (isRecord === true) {
+                // record Stop
+                isRecord = false;
+                record_btn.textContent = '計測開始';
+                rec_status_info.textContent = '記録待機中';
+                //save_btn.disabled = false;
+            } else {
+                // stop record
+                isRecord = true;
+                record_btn.textContent = '計測停止';
+                rec_status_info.textContent = '記録中';
+                //save_btn.disabled = false;
+            }
+        }
+
+        function save(){
+            // Save data
+            let params = new URLSearchParams();
+            let ex_title = document.getElementById('experimental_title').textContent;
+            params.append('g', document.getElementById('group_num').textContent);
+            params.append('e', ex_title);
+            params.append('d', JSON.stringify(record_data));
+            params.append('_authenticator', document.getElementsByName('_authenticator').item(0).value);
+            axios.post('add_graph', params)
+                    .then(response => {
+                        location.href = document.body.getAttribute('data-view-url') + "/measured_view?e=" + ex_title;
+                    }).catch(error => {
+                        console.log(error);
+                    });
+        }
+
+        record_btn.addEventListener('click', record, false);
+
+        let names = ['温度(c)', '記録データ'];
+        //let names = ['Temperature(c)'];
+
+        let dataset = new vis.DataSet();
+        let record_data = [];
+
+        let groups = new vis.DataSet();
+        groups.add({
+            id: 0,
+            content: names[0],
+            className: 'custom-style1',
+            options: {
+                drawPoints: {
+                    size: 3
+                }
+            }
+        });
+
+        groups.add({
+            id: 1,
+            content: names[1],
+            className: 'custom-style2',
+            options: {
+                drawPoints: {
+                    size: 1
+                }
+            }
+        });
+
+        groups.add({
+            id: 2,
+            content: names[2],
+            className: 'custom-style3',
+            options: {
+                drawPoints: {
+                    size: 1
+                }
+            }
+        });
+
+        let date = new Date();
+        let options = {
+            dataAxis: {
+                showMinorLabels: true,
+                alignZeros: true,
+                left: {
+                    range: { min: 0,
+                        max: 110
+                    }
+                }
+            },
+            width: '100%',
+            height: '450px',
+            legend: { left: { position: "bottom-left" } },
+            start: date.setMinutes(date.getMinutes() - 3),
+            end: date.setMinutes(date.getMinutes() + 30)
+        };
+        let graph2d = new vis.Graph2d(container, dataset, groups, options);
+
+        let mlkDs = MilkCocoa.connectWithApiKey(app_id, app_key, app_pass);
+        let data_store_path = app_ds + '/' + device_id;
+
+        mlkDs.dataStore(data_store_path).stream().size(150).sort('desc').next(function (err, data) {
+            data.forEach(function (d, i) {
+                //{"temp":31.25,"envtemp":25.96,"pressure":1006.45532,"humid":62.91309}
+                addItem(d.timestamp, d.value.temp, 0);
+                //addItem(d.timestamp, d.value.pressure, 1);
+                //addItem(d.timestamp, d.value.humid, 2);
+            });
+        });
+
+        function addItem(timestamp, value, g) {
+            itm = { x: new Date(timestamp).toLocaleString(), y: value, group: g };
+            dataset.add(itm);
+        }
+        function recordItem(timestamp, value) {
+            record_data.push({timestamp: timestamp, value: value});
+        }
+
+        mlkDs.dataStore(data_store_path).on('push', function(pushed) {
+            //console.log('pushed!', pushed.id, pushed.value);
+            addItem(pushed.timestamp, pushed.value.temp, 0);
+            //addItem(pushed.timestamp, pushed.value.pressure, 1);
+            //addItem(pushed.timestamp, pushed.value.humid, 2);
+            if (isRecord === true){
+                addItem(pushed.timestamp, pushed.value.temp, 1);
+                recordItem(pushed.timestamp, pushed.value);
+                document.getElementById('rec_num').textContent = pushed.value.temp
+            }
+            let now = new Date();
+            //graph2d.setWindow(now.setMinutes(now.getMinutes() - 5), now.setMinutes(now.getMinutes() + 35), {animation: false});
+        });
+
+
+    </script>
+
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>

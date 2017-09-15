@@ -1,0 +1,62 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:browser="http://namespaces.zope.org/browser"
+    xmlns:plone="http://namespaces.plone.org/plone"
+    i18n_domain="edu.iot.portfolio">
+
+  <!-- Set overrides folder for Just-a-Bunch-Of-Templates product -->
+  <include package="z3c.jbot" file="meta.zcml" />
+  <browser:jbot
+      directory="overrides"
+      layer="edu.iot.portfolio.interfaces.IEduIotPortfolioLayer"
+      />
+
+  <!-- Publish static files -->
+  <plone:static
+      name="edu.iot.portfolio"
+      type="plone"
+      directory="static"
+      />
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IExperiment"
+    name="view"
+    class=".view.ExperimentView"
+    permission="zope2.View"
+    template="templates/experiment_view.pt"
+    />
+
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IExperiment"
+    name="realtime_view"
+    class=".view.ExperimentNewGraphView"
+    permission="zope2.View"
+    template="templates/experiment_new_graph_view.pt"
+    />
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IExperiment"
+    name="add_graph"
+    class=".view.ExperimentAddGraph"
+    permission="zope2.View"
+    />
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IExperiment"
+    name="measured_view"
+    class=".view.ExperimentMeasuredGraphView"
+    permission="zope2.View"
+    template="templates/experiment_measured_view.pt"
+    />
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IMeasuredData"
+    name="view"
+    class=".view.MeasuredDataView"
+    permission="zope2.View"
+    template="templates/measureddata_view.pt"
+    />
+
+
+</configure>

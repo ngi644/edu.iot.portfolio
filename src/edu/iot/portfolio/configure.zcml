@@ -1,0 +1,37 @@
+<configure
+    xmlns="http://namespaces.zope.org/zope"
+    xmlns:genericsetup="http://namespaces.zope.org/genericsetup"
+    xmlns:i18n="http://namespaces.zope.org/i18n"
+    i18n_domain="edu.iot.portfolio">
+
+  <i18n:registerTranslations directory="locales" />
+
+  <includeDependencies package="." />
+
+  <include package=".browser" />
+
+
+  <genericsetup:registerProfile
+      name="default"
+      title="edu.iot.portfolio"
+      directory="profiles/default"
+      description="Installs the edu.iot.portfolio add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.post_install"
+      />
+
+  <genericsetup:registerProfile
+      name="uninstall"
+      title="edu.iot.portfolio (uninstall)"
+      directory="profiles/uninstall"
+      description="Uninstalls the edu.iot.portfolio add-on."
+      provides="Products.GenericSetup.interfaces.EXTENSION"
+      post_handler=".setuphandlers.uninstall"
+      />
+
+
+  <utility
+      factory=".setuphandlers.HiddenProfiles"
+      name="edu.iot.portfolio-hiddenprofiles" />
+
+</configure>

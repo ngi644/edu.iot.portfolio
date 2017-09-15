@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<object name="portal_catalog" meta_type="Plone Catalog Tool">
+
+  <index name="device_id"
+         meta_type="KeywordIndex">
+    <indexed_attr value="device_id"/>
+  </index>
+
+  <index name="group_num"
+         meta_type="KeywordIndex">
+    <indexed_attr value="group_num"/>
+  </index>
+
+  <index name="experimental_title"
+         meta_type="KeywordIndex">
+    <indexed_attr value="experimental_title"/>
+  </index>
+
+  <column value="device_id"/>
+  <column value="group_num"/>
+  <column value="experimental_title"/>
+  <column value="data"/>
+
+
+</object>

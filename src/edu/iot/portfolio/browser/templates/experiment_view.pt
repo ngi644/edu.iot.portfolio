@@ -1,0 +1,104 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+
+<script src="https://use.fontawesome.com/539b5348b3.js"></script>
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+        <script type="text/javascript">
+            require = undefined;
+            define = undefined;
+
+            function realtime_view() {
+                let uid = document.getElementsByClassName('device_id')[1].value;
+                let ex_title = document.getElementsByClassName('experiment')[1].value;
+                let group_num = document.getElementsByClassName('group_num')[1].value;
+                location.href = document.body.getAttribute('data-view-url') + '/realtime_view?uid=' + uid + '&e=' + ex_title + '&g=' + group_num;
+            }
+        </script>
+
+</metal:scripts>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+    <div class="row">
+        <div class="col-xs-8">
+            <h2>実験一覧</h2>
+        </div>
+        <div class="col-xs-4">
+            <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal" href="#modal_add" data-pat-plone-modal="width: 80%"><i class="fa fa-plus" aria-hidden="true"></i>新規計測</a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-xs-4" tal:repeat="ex_title context/get_experimental_list">
+            <h3>
+                <a tal:content="ex_title" tal:attributes="href string:${context/absolute_url}/measured_view?e=${ex_title}">ex_title</a>
+            </h3>
+            <ul tal:define="graphs python:context.get_graphs(ex_title)">
+                <li tal:repeat="graph graphs">
+                    <a tal:content="graph/Title" tal:attributes="href string:${context/absolute_url}/measured_view?e=${ex_title}&uid=${graph/UID}">graph</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="modal_add" style="display: none;">
+        <h1>実験名と班，使用するデバイスを選択してください</h1>
+        <p>選択後「表示」ボタンを押してください．</p>
+        <div class="row">
+            <div class="col-xs-3">
+                実験名
+            </div>
+            <div class="col-xs-9">
+                <select class="experiment">
+                    <option tal:repeat="ex_title context/get_experimental_list"
+                         tal:attributes="value ex_title" tal:content="ex_title">title</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                班
+            </div>
+            <div class="col-xs-9">
+                <select class="group_num">
+                    <option tal:repeat="group context/get_group_list"
+                        tal:attributes="value group" tal:content="string:${group}班">group name</option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-3">
+                デバイス
+            </div>
+            <div class="col-xs-9">
+                <select class="device_id">
+                    <option tal:repeat="device context/get_devices"
+                        tal:attributes="value device/UID" tal:content="device/Title">device name</option>
+                </select>
+            </div>
+        </div>
+        <p><button id="btnrealtime" onclick="realtime_view()">表示</button></p>
+    </div>
+
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>
