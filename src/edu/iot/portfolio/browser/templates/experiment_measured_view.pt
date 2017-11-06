@@ -10,6 +10,23 @@
 
 
 <metal:style fill-slot="style_slot">
+    <style>
+        #visualization text {
+            transform: rotate(0);
+            font-style: normal;
+        }
+        #series li{
+            margin:0.5em 1em;
+            font-size: 1.2em;
+            cursor: pointer;
+            float: left;
+        }
+
+        #series li label{
+            cursor: pointer;
+        }
+
+    </style>
 
 
 </metal:style>
@@ -26,34 +43,68 @@
 
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 
-
     <script type="text/javascript">
       google.charts.load('current', {'packages':['corechart']});
       google.charts.setOnLoadCallback(drawChart);
 
-      function drawChart() {
-        var data = google.visualization.arrayToDataTable(data_set);
 
-        var options = {
-            title: document.getElementById('ex_title').textContent,
-            legend: { position: 'right' },
+      function addChackbox(num, title){
+          $('#series').append('<li><input type="checkbox" name="series" id="series-' + num + '" value="' + num + '" checked="true" />' +
+                  '<label for="series-' + num + '">' + title + '</label></li>');
+      }
+
+      function dowloadGraph(){
+          document.getElementById("download").href = chart.getImageURI();
+      }
+
+      function drawChart() {
+
+          view = new google.visualization.DataView(google.visualization.arrayToDataTable(data_set));
+
+          options = {
+            title: $('#ex_title').text(),
             pointSize: 5,
             hAxis: {
-              title: '時間(秒)'
+                title: '時間(分)',
             },
             vAxis: {
-              title: '温度(c)',
-                maxValue: 110,
-                minValue: 0
+              title: '温度(℃)',
+                maxValue: 110
+            },
+            theme: {
+                legend: {position: 'right'},
+                titlePosition: 'out',
+                axisTitlesPosition: 'out',
+                hAxis: {textPosition: 'out'},
+                vAxis: {textPosition: 'out'},
+                titleTextStyle: {
+                    fontSize: 22,
+                    bold: true,
+                    italic: false
+                }
             }
+          };
+          chart = new google.visualization.LineChart(document.getElementById('visualization'));
+          chart.draw(view, options);
 
-        };
-
-        var chart = new google.visualization.LineChart(document.getElementById('visualization'));
-
-        chart.draw(data, options);
-        document.getElementById('png').outerHTML = '<a href="' + chart.getImageURI() + '" target="_blank"><i class="fa fa-file-image-o" aria-hidden="true"></i>Printable version</a>';
+          for (let i in data_set[0]){
+              if (i > 0){
+                  addChackbox(i, data_set[0][i]);
+              }
+          }
       }
+
+      $(document).on('click', '#series :checkbox', function() {
+          let cols = [0];
+          let colors = [];
+          $('#series').find(':checkbox:checked').each(function () {
+              let value = parseInt($(this).attr('value'));
+              cols.push(value);
+          });
+          view.setColumns(cols);
+          chart.draw(view, options);
+      });
+
     </script>
 
     <script src="https://use.fontawesome.com/539b5348b3.js"></script>
@@ -67,27 +118,26 @@
 
     <div class="row">
         <div class="col-xs-12">
-            <h3 tal:content="string:${view/get_experimental_title}" id="ex_title"></h3>
+            <h3 tal:content="string:${context/title}: ${view/get_experimental_title}${view/get_group_title}" id="ex_title"></h3>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-12">
+            <ul id="series" style="list-style: none"></ul>
         </div>
     </div>
 
 
     <div id="visualization" style="width: 100%; height: 650px"></div>
     <div id='png'></div>
+    <a id="download" href="#" download="graph.png" onclick="dowloadGraph()">
+        <i class="fa fa-file-image-o" aria-hidden="true"></i>ダウンロード</a>
 
 
     <div class="visualClear"><!-- --></div>
 
     <span tal:replace="structure context/@@authenticator/authenticator"/>
 
-
-    <script type="text/javascript">
-
-
-        let container = document.getElementById('visualization');
-
-
-    </script>
 
 
 </metal:main_macro>

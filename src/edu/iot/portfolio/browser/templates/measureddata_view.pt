@@ -31,6 +31,7 @@
 
     <h3><span tal:content="context/experimental_title"></span>: <span tal:content="string:${context/group_num}班"></span></h3>
 
+    <div>${context/memo}</div>
     <div tal:content="context/data"></div>
 
 

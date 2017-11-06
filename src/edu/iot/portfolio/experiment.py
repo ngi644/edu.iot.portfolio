@@ -60,7 +60,7 @@ class Experiment(Container):
             return unit.experimental_list
         return []
 
-    def get_graphs(self, experimental_title=None, uid=None):
+    def get_graphs(self, experimental_title=None, uid=None, group_num=None):
         """
 
         :return:
@@ -76,5 +76,7 @@ class Experiment(Container):
             base_query['experimental_title'] = experimental_title
         if uid:
             base_query['UID'] = uid
+        if group_num:
+            base_query['group_num'] = group_num
         graphs = portal_catalog(base_query)
         return graphs

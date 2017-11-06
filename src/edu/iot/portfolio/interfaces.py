@@ -82,6 +82,11 @@ class IMeasuredData(model.Schema):
         required=False,
     )
 
+    memo = schema.Text(
+        title=_(u'Memo'),
+        required=False,
+    )
+
     data = schema.Text(
         title=_(u'Data'),
         required=False,
