@@ -20,6 +20,7 @@
   <column value="group_num"/>
   <column value="experimental_title"/>
   <column value="data"/>
+  <column value="memo"/>
 
 
 </object>

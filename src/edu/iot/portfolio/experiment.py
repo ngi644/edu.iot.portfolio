@@ -10,7 +10,6 @@ from Products.CMFCore.utils import getToolByName
 class Experiment(Container):
     """A experiment class"""
 
-
     def get_unit(self):
         """
         単元データの取得

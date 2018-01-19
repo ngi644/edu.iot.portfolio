@@ -110,34 +110,45 @@ class ExperimentMeasuredGraphView(BrowserView):
         else:
             return u'"{}: {}班"'.format(ex_title, group_num)
 
-    def get_dataset(self):
+    def _get_datasets(self):
         ex_title = self.request.form.get('e', u'')
         g_num = self.request.form.get('g', u'')
         uid = self.request.form.get('uid', u'')
         graphs = [x for x in self.context.get_graphs(ex_title, uid, g_num) if json.loads(x.data)]
         data_set = []
+        review_set = []
         values = []
         labels = [self._get_label_name(x.group_num, x.experimental_title, ex_title, g_num) for x in graphs]
         data_set.append(u'[{}]'.format(u','.join([u'"time"'] + labels)))
         max_size = 0
-        for g in graphs:
+        for i, g in enumerate(graphs):
             dl = [x['value']['temp'] for x in json.loads(g.data)]
             if len(dl) > max_size:
                 max_size = len(dl)
             values.append(dl)
+            review_set.append(dict(title=labels[i].replace('"', ''), memo=g.memo))
         for num in range(max_size):
             data_row = [str(num * 0.5)]
             for v in values:
                 data_row.append(self._get_value(v, num))
             data_set.append(u'[{}]'.format(u','.join(data_row)))
 
+        return data_set, review_set
+
+    def get_dataset(self):
+
+        data_set, review_set = self._get_datasets()
         sc = '''
             <script type="text/javascript">
             var data_set = [{}];
             </script>
             '''.format(u','.join(data_set))
-
         return sc
+
+    def get_comments(self):
+        data_set, review_set = self._get_datasets()
+        return review_set
+
 
 
 @implementer(IMeasuredData)

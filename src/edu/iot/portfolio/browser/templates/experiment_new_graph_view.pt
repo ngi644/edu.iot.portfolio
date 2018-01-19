@@ -141,8 +141,8 @@
             let ex_title = document.getElementById('experimental_title').textContent;
             params.append('g', document.getElementById('group_num').textContent);
             params.append('e', ex_title);
-            console.log(document.getElementsByClassName('memo')[1].value)
-            params.append('m', document.getElementsByClassName('memo')[1].value)
+            console.log(document.getElementsByClassName('memo')[1].value);
+            params.append('m', document.getElementsByClassName('memo')[1].value);
             params.append('d', JSON.stringify(record_data));
             params.append('_authenticator', document.getElementsByName('_authenticator').item(0).value);
             axios.post('add_graph', params)
