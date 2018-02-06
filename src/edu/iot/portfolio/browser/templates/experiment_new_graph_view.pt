@@ -37,6 +37,31 @@
             stroke-width: 2px;
             stroke: #0016dc;
         }
+
+        .monitor_panel {
+          width: 45%;
+          background: beige;
+          border-radius: 5px;
+          padding: 0.3em;
+          text-align: center;
+          border: 2px #c1c1ac solid;
+          display: block;
+          float: left;
+          margin-bottom: 0.5em;
+          margin-right: 0.5em;
+        }
+
+        .p_green{
+          background: rgba(248, 240, 224, 0.88);
+          color: black;
+          border: #c1c1ac 1px solid;
+        }
+
+        .p_plane{
+          padding: 0;
+          background: transparent;
+          border: none;
+        }
     </style>
 
 
@@ -81,13 +106,22 @@
 
     <div class="row">
         <div class="col-xs-4">
-            <button id="btnRecord">計測開始</button>
+            <div class="monitor_panel p_plane">
+              <button id="btnRecord">計測開始</button><br>
+            </div>
+            <div class="monitor_panel p_green">
+              <span id="rec_status">記録待機中</span>
+            </div>
         </div>
         <div class="col-xs-4">
-            <p id="rec_status">記録待機中</p>
-            <p id ="rec_num" style="color:red; font-size: 14px;"></p>
+            <div class="monitor_panel">
+              <span id="timer" style="color:cadetblue; font-size: 14px;">-分 -秒</span>
+            </div>
+            <div class="monitor_panel">
+              <span id ="rec_num" style="color:red; font-size: 14px;">--.- ℃</span>
+            </div>
         </div>
-        <div class="col-xs-4">
+        <div class="col-xs-3">
             <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal" href="#modal_save" data-pat-plone-modal="width: 70%"><i class="fa fa-floppy-o" aria-hidden="true"><span>保存</span></a>
         </div>
     </div>
@@ -118,6 +152,16 @@
         let rec_status_info = document.getElementById('rec_status');
 
         let isRecord = false;
+        let timedCount = 0.0;
+        var timerID;
+
+        function intervalTrigger() {
+          return setInterval( function() {
+            timedCount++;
+            document.getElementById('timer').textContent = (timedCount / 60 | 0) +  "分 " + (timedCount % 60) + "秒";
+            //console.log(timedCount);
+          }, 1000 );
+        }
 
         function record(){
             if (isRecord === true) {
@@ -126,11 +170,16 @@
                 record_btn.textContent = '計測開始';
                 rec_status_info.textContent = '記録待機中';
                 //save_btn.disabled = false;
+                clearInterval(timerID);
+
             } else {
-                // stop record
+                // Record start
                 isRecord = true;
                 record_btn.textContent = '計測停止';
                 rec_status_info.textContent = '記録中';
+                record_data = [];
+                timedCount = 0;
+                timerID = intervalTrigger();
                 //save_btn.disabled = false;
             }
         }
@@ -242,7 +291,7 @@
             if (isRecord === true){
                 addItem(pushed.timestamp, pushed.value.temp, 1);
                 recordItem(pushed.timestamp, pushed.value);
-                document.getElementById('rec_num').textContent = pushed.value.temp
+                document.getElementById('rec_num').textContent = pushed.value.temp + " ℃";
             }
             let now = new Date();
             //graph2d.setWindow(now.setMinutes(now.getMinutes() - 5), now.setMinutes(now.getMinutes() + 35), {animation: false});
