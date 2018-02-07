@@ -9,6 +9,7 @@ from zope.interface import implementer
 from zope.interface import implements
 from Products.CMFCore.utils import getToolByName
 import json
+import datetime
 from plone import api
 
 
@@ -104,45 +105,46 @@ class ExperimentMeasuredGraphView(BrowserView):
 
     def _get_label_name(self, group_num, ex_title, filter_e, filter_g):
         if filter_e:
-            return u'"{}班"'.format(group_num)
+            return u'{}班'.format(group_num)
         elif filter_g:
-            return u'"{}"'.format(ex_title)
+            return u'{}'.format(ex_title)
         else:
-            return u'"{}: {}班"'.format(ex_title, group_num)
+            return u'{}: {}班'.format(ex_title, group_num)
 
-    def _get_datasets(self):
+    def _get_datasets(self, m_key='temp'):
         ex_title = self.request.form.get('e', u'')
         g_num = self.request.form.get('g', u'')
         uid = self.request.form.get('uid', u'')
         graphs = [x for x in self.context.get_graphs(ex_title, uid, g_num) if json.loads(x.data)]
-        data_set = []
         review_set = []
-        values = []
         labels = [self._get_label_name(x.group_num, x.experimental_title, ex_title, g_num) for x in graphs]
-        data_set.append(u'[{}]'.format(u','.join([u'"time"'] + labels)))
-        max_size = 0
+        data_list = []
         for i, g in enumerate(graphs):
-            dl = [x['value']['temp'] for x in json.loads(g.data)]
-            if len(dl) > max_size:
-                max_size = len(dl)
-            values.append(dl)
-            review_set.append(dict(title=labels[i].replace('"', ''), memo=g.memo))
-        for num in range(max_size):
-            data_row = [str(num * 0.5)]
-            for v in values:
-                data_row.append(self._get_value(v, num))
-            data_set.append(u'[{}]'.format(u','.join(data_row)))
+            g_x = []
+            g_y = []
+            for posi, m_data in enumerate(json.loads(g.data)):
+                if posi < 1:
+                    sec = 0
+                    start_timestamp = datetime.datetime.fromtimestamp(m_data['timestamp'] / 1000)
+                else:
+                    tdl = datetime.datetime.fromtimestamp(m_data['timestamp'] / 1000) - start_timestamp
+                    sec = tdl.seconds
+                g_x.append(round(sec / 60.0, 1))
+                g_y.append(round(m_data['value'][m_key], 1))
 
-        return data_set, review_set
+            data_list.append(dict(x=g_x, y=g_y, name=labels[i], type='scatter'))
+            review_set.append(dict(title=labels[i], memo=g.memo))
+
+        return data_list, review_set
 
     def get_dataset(self):
 
         data_set, review_set = self._get_datasets()
         sc = '''
             <script type="text/javascript">
-            var data_set = [{}];
+            var data_json = '{}';
             </script>
-            '''.format(u','.join(data_set))
+            '''.format(json.dumps(data_set))
         return sc
 
     def get_comments(self):
