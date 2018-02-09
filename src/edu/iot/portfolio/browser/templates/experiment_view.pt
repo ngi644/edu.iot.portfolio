@@ -14,6 +14,7 @@
 <script src="https://use.fontawesome.com/539b5348b3.js"></script>
 
   <style>
+
     .add_ex {
       width: calc(100vw * 0.5);
       height: 2em;
@@ -33,6 +34,42 @@
       display: flex;
       margin: 0.5em;
     }
+
+    .ex_result_area{
+      padding: 0.5em;
+      border-top-left-radius: 10px;
+      border-top: 3px rgba(193, 193, 172, 0.77) solid;
+      border-left: 3px rgba(193, 193, 172, 0.77) solid;
+      margin: 1em 0;
+    }
+
+    .ex_result_subarea{
+      border-top-right-radius: 10px;
+      border-right: 2px rgba(193, 193, 172, 0.77) solid;
+      border-top: 2px rgba(193, 193, 172, 0.77) solid;
+    }
+    .tag_btn{
+      margin: 1.5em 0;
+    }
+
+    .tag_btn li{
+      list-style: none;
+      width: auto;
+      display: inline-block;
+      margin: 1.0em 1.5em 0.5em 0;
+      border-radius: 5px;
+      padding: 0.5em 0.7em;
+      background: #f29a27;
+      color: beige;
+    }
+
+    .tag_btn a{
+      font-weight: bolder;
+      color: beige;
+      border-bottom: none !important;
+      width: 100%;
+    }
+
 
   </style>
 
@@ -61,37 +98,39 @@
 
     <div class="row">
         <div class="col-xs-12">
-            <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal add_ex" href="#modal_add" data-pat-plone-modal="width: 80%"><i class="fa fa-plus" aria-hidden="true"></i>新規計測</a>
+            <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal add_ex" href="#modal_add" data-pat-plone-modal="width: 80%"><i class="fa fa-plus" aria-hidden="true"></i>&nbsp;新規計測</a>
         </div>
     </div>
 
-    <div class="row">
+    <div class="row ex_result_area">
         <div class="col-xs-12">
-            <h2><a tal:attributes="href string:${context/absolute_url}/measured_view">実験結果</a></h2>
-            <ul>
-                <li tal:repeat="group context/get_group_list">
+            <h3><a tal:attributes="href string:${context/absolute_url}/measured_view"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;実験結果</a></h3>
+            <ul class="tag_btn">
+                <li tal:repeat="group context/get_valid_group_list">
                     <a tal:content="string:${group}班のデータ" tal:attributes="href string:${context/absolute_url}/measured_view?g=${group}">Group</a>
                 </li>
             </ul>
+
+            <div class="row">
+                <div class="col-xs-4 ex_result_subarea" tal:repeat="ex_title context/get_experimental_list">
+                    <h4>
+                        <a tal:attributes="href string:${context/absolute_url}/measured_view?e=${ex_title}"><i class="fa fa-bar-chart" aria-hidden="true"></i>&nbsp;${ex_title}</a>
+                    </h4>
+                    <ul tal:define="graphs python:context.get_graphs(ex_title)" class="tag_btn">
+                        <li tal:repeat="graph graphs">
+                            <a tal:content="graph/Title" tal:attributes="href string:${context/absolute_url}/measured_view?e=${ex_title}&uid=${graph/UID}">graph</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <div class="row">
-        <div class="col-xs-4" tal:repeat="ex_title context/get_experimental_list">
-            <h3>
-                <a tal:content="ex_title" tal:attributes="href string:${context/absolute_url}/measured_view?e=${ex_title}">ex_title</a>
-            </h3>
-            <ul tal:define="graphs python:context.get_graphs(ex_title)">
-                <li tal:repeat="graph graphs">
-                    <a tal:content="graph/Title" tal:attributes="href string:${context/absolute_url}/measured_view?e=${ex_title}&uid=${graph/UID}">graph</a>
-                </li>
-            </ul>
-        </div>
-    </div>
 
     <div id="modal_add" style="display: none;">
         <h1>実験名と班，使用するデバイスを選択してください</h1>
-        <p>選択後「表示」ボタンを押してください．</p>
+        <p>選択後「グラフ表示」ボタンを押してください．</p>
         <div class="row add_dialog">
             <div class="col-xs-3">
                 実験名
@@ -125,7 +164,7 @@
                 </select>
             </div>
         </div>
-        <p><button id="btnrealtime" onclick="realtime_view()">表示</button></p>
+        <p><button id="btnrealtime" onclick="realtime_view()">グラフ表示</button></p>
     </div>
 
 

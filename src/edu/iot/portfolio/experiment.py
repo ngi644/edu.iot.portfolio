@@ -49,6 +49,19 @@ class Experiment(Container):
             return [x+1 for x in range(unit.group_count)]
         return []
 
+    def get_valid_group_list(self):
+        """
+        データのある班のみ返す。
+        :return:
+        """
+        g_list = []
+        for ex in self.get_experimental_list():
+            for g in self.get_group_list():
+                r = self.get_graphs(experimental_title=ex, group_num=str(g))
+                if r:
+                    g_list.append(g)
+        return list(set(g_list))
+
     def get_experimental_list(self):
         """
         単元のデータから実験リストを取得
