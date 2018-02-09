@@ -84,6 +84,9 @@
         var layout = {
           title: '${context/title}: ${view/get_experimental_title} ${view/get_group_title}',
           showlegend: true,
+          margin: {
+            pad:20
+          },
           xaxis: {
             title:'時間(分)',
             autotick: true,

@@ -11,6 +11,16 @@ from Products.CMFCore.utils import getToolByName
 import json
 import datetime
 from plone import api
+import decimal
+
+
+def round_harf_even(num, q='.1'):
+    """
+    banker's rounding
+    """
+    d_num = decimal.Decimal(num).quantize(decimal.Decimal(q), rounding=decimal.ROUND_HALF_EVEN)
+    return float(d_num)
+
 
 
 @implementer(IExperiment)
@@ -130,9 +140,11 @@ class ExperimentMeasuredGraphView(BrowserView):
                     tdl = datetime.datetime.fromtimestamp(m_data['timestamp'] / 1000) - start_timestamp
                     sec = tdl.seconds
                 g_x.append(round(sec / 60.0, 1))
-                g_y.append(round(m_data['value'][m_key], 1))
+                g_y.append(round_harf_even(m_data['value'][m_key]))
 
-            data_list.append(dict(x=g_x, y=g_y, name=labels[i], type='scatter'))
+            data_list.append(dict(x=g_x, y=g_y, name=labels[i], type='scatter',
+                                  mode='lines+markers',
+                                  marker=dict(symbol='circle', size=4)))
             review_set.append(dict(title=labels[i], memo=g.memo))
 
         return data_list, review_set

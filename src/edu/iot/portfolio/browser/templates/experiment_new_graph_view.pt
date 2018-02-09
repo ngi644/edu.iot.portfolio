@@ -128,10 +128,10 @@
 
     <div id="modal_save" style="display: none;">
         <h1>記録したデータを保存します</h1>
-        <p>よろしければ「OK」ボタンを押してください．</p>
+        <p>よろしければ「保存」ボタンを押してください．</p>
         <h4>メモ</h4>
         <textarea class="memo"></textarea>
-        <p><button id="btnSave" onclick="save()">OK</button></p>
+        <p><button id="btnSave" onclick="save()">保存</button></p>
     </div>
 
     <div id="visualization"></div>
