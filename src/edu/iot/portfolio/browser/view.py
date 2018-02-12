@@ -143,7 +143,6 @@ class ExperimentMeasuredGraphView(BrowserView):
                 else:
                     tdl = now_time - past_timestamp
                     now_sec = step_round(tdl.seconds)
-                    print(now_sec)
                 total_sec += now_sec
                 g_x.append(round_harf_even(total_sec / 60.0, '.01'))
                 g_y.append(round_harf_even(m_data['value'][m_key]))
