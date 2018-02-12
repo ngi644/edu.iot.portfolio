@@ -22,6 +22,9 @@ def round_harf_even(num, q='.1'):
     return float(d_num)
 
 
+def step_round(x, base=5):
+    return base * round(float(x)/base)
+
 
 @implementer(IExperiment)
 class ExperimentView(BrowserView):
@@ -133,14 +136,18 @@ class ExperimentMeasuredGraphView(BrowserView):
             g_x = []
             g_y = []
             for posi, m_data in enumerate(json.loads(g.data)):
+                now_time = datetime.datetime.fromtimestamp(m_data['timestamp'] / 1000)
                 if posi < 1:
-                    sec = 0
-                    start_timestamp = datetime.datetime.fromtimestamp(m_data['timestamp'] / 1000)
+                    total_sec = 0
+                    now_sec = 0
                 else:
-                    tdl = datetime.datetime.fromtimestamp(m_data['timestamp'] / 1000) - start_timestamp
-                    sec = tdl.seconds
-                g_x.append(round(sec / 60.0, 1))
+                    tdl = now_time - past_timestamp
+                    now_sec = step_round(tdl.seconds)
+                    print(now_sec)
+                total_sec += now_sec
+                g_x.append(round_harf_even(total_sec / 60.0, '.01'))
                 g_y.append(round_harf_even(m_data['value'][m_key]))
+                past_timestamp = now_time
 
             data_list.append(dict(x=g_x, y=g_y, name=labels[i], type='scatter',
                                   mode='lines+markers',
