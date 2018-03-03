@@ -8,6 +8,9 @@
 
 <body>
 
+<metal:override fill-slot="top_slot"
+    tal:define="disable_column_one python:request.set('disable_plone.leftcolumn',1);
+                disable_column_two python:request.set('disable_plone.rightcolumn',1);"/>
 
 <metal:style fill-slot="style_slot">
 
@@ -48,6 +51,7 @@
       border-right: 2px rgba(193, 193, 172, 0.77) solid;
       border-top: 2px rgba(193, 193, 172, 0.77) solid;
     }
+
     .tag_btn{
       margin: 1.5em 0;
     }

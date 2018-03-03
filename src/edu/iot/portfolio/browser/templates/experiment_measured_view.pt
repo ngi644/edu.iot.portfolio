@@ -18,7 +18,6 @@
           height: 670px;
         }
 
-
         #viz_table {
             width: 100%;
             display: block;
@@ -56,6 +55,10 @@
           width: 100%;
         }
 
+      .js-plotly-plot .plotly .modebar-btn{
+        font-size: 26px !important;
+      }
+
 
     </style>
 
@@ -84,6 +87,7 @@
         var layout = {
           title: '${context/title}: ${view/get_experimental_title} ${view/get_group_title}',
           showlegend: true,
+          dragmode: 'pan',
           margin: {
             pad:20
           },
@@ -105,7 +109,9 @@
         };
 
         var option = {
-          modeBarButtonsToRemove: ['sendDataToCloud', 'autoScale2d', 'lasso2d', 'select2d'],
+          modeBarButtonsToRemove: ['sendDataToCloud', 'toImage', 'zoom2d', 'pan2d',
+            'autoScale2d', 'lasso2d', 'select2d',
+            'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'],
           displaylogo: false
         };
 
@@ -123,10 +129,32 @@
 
 </metal:scripts>
 
+<metal:override fill-slot="top_slot"
+    tal:define="disable_column_one python:request.set('disable_plone.leftcolumn',1);
+                disable_column_two python:request.set('disable_plone.rightcolumn',1);"/>
+
 <metal:content-core fill-slot="content-core">
 <metal:main_macro define-macro="content-core">
 
-    <a tal:attributes="href context/absolute_url"><i class="fa fa-arrow-left" aria-hidden="true"></i>実験Top</a>
+
+
+    <div class="row" style="margin-bottom: 0.5em;">
+        <div class="col-xs-4">
+          <a tal:attributes="href context/absolute_url"><i class="fa fa-arrow-left" aria-hidden="true"></i>実験Top</a>
+        </div>
+        <div class="col-xs-8">
+            <a class="plone-btn plone-btn-primary" href=""
+              tal:attributes="href string:${context/absolute_url}/measured_view?e=${view/get_experimental_title}"
+              tal:condition="view/get_experimental_title">
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>${view/get_experimental_title}の全班
+            </a>
+          <a class="plone-btn plone-btn-primary" href=""
+              tal:attributes="href string:${context/absolute_url}/measured_view"
+            tal:condition="not:view/get_experimental_title">
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>全ての実験
+          </a>
+        </div>
+    </div>
 
     <div class="row">
         <div class="col-xs-12">
