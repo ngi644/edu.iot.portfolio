@@ -188,7 +188,8 @@
             // Save data
             let params = new URLSearchParams();
             let ex_title = document.getElementById('experimental_title').textContent;
-            params.append('g', document.getElementById('group_num').textContent);
+            let g_num = document.getElementById('group_num').textContent;
+            params.append('g', g_num);
             params.append('e', ex_title);
             console.log(document.getElementsByClassName('memo')[1].value);
             params.append('m', document.getElementsByClassName('memo')[1].value);
@@ -196,7 +197,7 @@
             params.append('_authenticator', document.getElementsByName('_authenticator').item(0).value);
             axios.post('add_graph', params)
                     .then(response => {
-                        location.href = document.body.getAttribute('data-view-url') + "/measured_view?e=" + ex_title;
+                        location.href = document.body.getAttribute('data-view-url') + "/measured_view?e=" + ex_title + "&g=" + g_num;
                     }).catch(error => {
                         console.log(error);
                     });

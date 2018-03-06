@@ -112,8 +112,7 @@
           modeBarButtonsToRemove: ['sendDataToCloud', 'toImage', 'zoom2d', 'pan2d',
             'autoScale2d', 'lasso2d', 'select2d',
             'toggleSpikelines', 'hoverClosestCartesian', 'hoverCompareCartesian'],
-          displaylogo: false,
-          displayModeBar: true
+          displaylogo: false
         };
 
         Plotly.newPlot('visualization', data, layout, option);
