@@ -100,7 +100,7 @@
 <metal:title fill-slot="content-title">
   <div class="row">
     <div class="col-xs-12">
-      <h3>${context/year}年度 ${context/grade} ${context/klassname}</h3>
+      <h3>${python:context.__parent__.title} ${context/year}年度 ${context/grade} ${context/klassname}</h3>
     </div>
   </div>
   <h1 class="documentFirstHeading" tal:content="context/title"></h1>
