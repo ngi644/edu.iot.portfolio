@@ -16,11 +16,30 @@
     <indexed_attr value="experimental_title"/>
   </index>
 
+  <index name="year"
+         meta_type="KeywordIndex">
+    <indexed_attr value="year"/>
+  </index>
+
+  <index name="grade"
+         meta_type="KeywordIndex">
+    <indexed_attr value="grade"/>
+  </index>
+
+  <index name="klassname"
+         meta_type="KeywordIndex">
+    <indexed_attr value="klassname"/>
+  </index>
+
+
   <column value="device_id"/>
   <column value="group_num"/>
   <column value="experimental_title"/>
   <column value="data"/>
   <column value="memo"/>
+  <column value="year"/>
+  <column value="grade"/>
+  <column value="klassname"/>
 
 
 </object>

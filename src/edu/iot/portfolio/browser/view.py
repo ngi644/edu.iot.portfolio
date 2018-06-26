@@ -12,6 +12,7 @@ import json
 import datetime
 from plone import api
 import decimal
+import urllib
 
 
 def round_harf_even(num, q='.1'):
@@ -124,15 +125,60 @@ class ExperimentMeasuredGraphView(BrowserView):
         else:
             return u'{}: {}班'.format(ex_title, group_num)
 
+    def _get_other_label_name(self, group_num, ex_title, ext_obj, filter_e=None):
+        """
+
+        :param group_num:
+        :param ex_title:
+        :param ext_obj:
+        :return:
+        """
+        nl = []
+        if ext_obj:
+            if self.context.__parent__.title != ext_obj.__parent__.title:
+                nl.append(u'{}|'.format(ext_obj.__parent__.title))
+            nl.append('{}年度{}{} {}班|'.format(ext_obj.year, ext_obj.grade, ext_obj.klassname, group_num))
+            if not filter_e:
+                nl.append(ex_title)
+        return u''.join(nl)
+
+    def _get_obj_by_uid(self, uid=None):
+        """
+
+        :param uid:
+        :return:
+        """
+        base_query = {}
+        portal_catalog = getToolByName(self, 'portal_catalog')
+        if uid:
+            base_query['UID'] = uid
+            return portal_catalog(base_query)[0].getObject()
+        return None
+
     def _get_datasets(self, m_key='temp'):
         ex_title = self.request.form.get('e', u'')
         g_num = self.request.form.get('g', u'')
         uid = self.request.form.get('uid', u'')
+        o_g_num = self.request.form.get('og', u'')
+        o_uid = self.request.form.get('ouid', u'')
+        o_euid = self.request.form.get('oeuid', u'')
+        if o_euid:
+            other_obj = self._get_obj_by_uid(o_euid)
+            other_search = True
+        else:
+            other_obj = None
+            other_search = False
         graphs = [x for x in self.context.get_graphs(ex_title, uid, g_num) if json.loads(x.data)]
+        if other_search:
+            other_graphs = [x for x in self.context.get_graphs(ex_title, o_uid, o_g_num, other_obj) if json.loads(x.data)]
+        else:
+            other_graphs = []
         review_set = []
-        labels = [self._get_label_name(x.group_num, x.experimental_title, ex_title, g_num) for x in graphs]
+        main_labels = [self._get_label_name(x.group_num, x.experimental_title, ex_title, g_num) for x in graphs]
+        other_labels = [self._get_other_label_name(x.group_num, x.experimental_title, other_obj, ex_title).replace('|', '<br>') for x in other_graphs]
+        labels = main_labels + other_labels
         data_list = []
-        for i, g in enumerate(graphs):
+        for i, g in enumerate(graphs + other_graphs):
             g_x = []
             g_y = []
             for posi, m_data in enumerate(json.loads(g.data)):
@@ -169,6 +215,25 @@ class ExperimentMeasuredGraphView(BrowserView):
         data_set, review_set = self._get_datasets()
         return review_set
 
+    def get_other_link(self, oeuid, og):
+        """
+
+        :param g_uid:
+        :param g_:
+        :return:
+        """
+
+        ex_title = self.request.form.get('e', u'')
+        g_num = self.request.form.get('g', u'')
+        uid = self.request.form.get('uid', u'')
+        o_uid = self.request.form.get('ouid', u'')
+        qs = urllib.urlencode(dict(e=ex_title,
+                                    g=g_num,
+                                    uid=uid,
+                                    og=og,
+                                   oeuid=oeuid,
+                                   ouid=o_uid))
+        return '{}/measured_view?{}'.format(self.context.absolute_url(), qs)
 
 
 @implementer(IMeasuredData)

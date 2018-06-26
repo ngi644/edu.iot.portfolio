@@ -28,7 +28,7 @@
         }
 
         .comment-card{
-            width: calc(100vw/4);
+            width: calc(100vw/3.3);
             min-height: 10vh;
             float: left;
             background-color: #f5f1f0;
@@ -44,7 +44,6 @@
           font-weight: 800;
           display: block;
           width: 100%;
-          height: 1.5em;
         }
         .card-body {
           padding: 0.8vh;
@@ -59,6 +58,32 @@
         font-size: 28px !important;
       }
 
+    .add_dialog{
+      display: flex;
+      margin: 0.5em;
+    }
+
+    .tag_btn{
+      margin: 0.5em 0;
+    }
+
+    .tag_btn li{
+      list-style: none;
+      width: auto;
+      display: inline-block;
+      margin: 1.0em 1.5em 0.5em 0;
+      border-radius: 5px;
+      padding: 0.5em 0.7em;
+      background: #f29a27;
+      color: beige;
+    }
+
+    .tag_btn a{
+      font-weight: bolder;
+      color: beige;
+      border-bottom: none !important;
+      width: 100%;
+    }
 
     </style>
 
@@ -87,6 +112,9 @@
         var layout = {
           title: '${context/title}: ${view/get_experimental_title} ${view/get_group_title}',
           showlegend: true,
+          legend: {
+            font :{size: 13}
+          },
           dragmode: 'pan',
           margin: {
             pad:20
@@ -96,7 +124,7 @@
             autotick: true,
             ticks: 'outside',
             tick0: 0,
-            dtick: 1
+            dtick: 1,
           },
           yaxis: {
             title: '温度(℃)',
@@ -133,6 +161,17 @@
     tal:define="disable_column_one python:request.set('disable_plone.leftcolumn',1);
                 disable_column_two python:request.set('disable_plone.rightcolumn',1);"/>
 
+
+<metal:title fill-slot="content-title">
+  <div class="row">
+    <div class="col-xs-12">
+      <h3>${context/year}年度 ${context/grade} ${context/klassname}</h3>
+    </div>
+  </div>
+  <h1 class="documentFirstHeading" tal:content="context/title"></h1>
+</metal:title>
+
+
 <metal:content-core fill-slot="content-core">
 <metal:main_macro define-macro="content-core">
 
@@ -142,17 +181,21 @@
         <div class="col-xs-4">
           <a tal:attributes="href context/absolute_url"><i class="fa fa-arrow-left" aria-hidden="true"></i>実験Top</a>
         </div>
-        <div class="col-xs-8">
+        <div class="col-xs-4">
             <a class="plone-btn plone-btn-primary" href=""
               tal:attributes="href string:${context/absolute_url}/measured_view?e=${view/get_experimental_title}"
               tal:condition="view/get_experimental_title">
-              <i class="fa fa-arrow-right" aria-hidden="true"></i>${view/get_experimental_title}の全班
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>クラスの${view/get_experimental_title}のグラフ
             </a>
           <a class="plone-btn plone-btn-primary" href=""
               tal:attributes="href string:${context/absolute_url}/measured_view"
             tal:condition="not:view/get_experimental_title">
-              <i class="fa fa-arrow-right" aria-hidden="true"></i>全ての実験
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>クラスの全てのグラフ
           </a>
+        </div>
+        <div class="col-xs-4">
+            <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal add_ex" href="#modal_graph" data-pat-plone-modal="width: 80%">
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>他校・他クラスのグラフ</a>
         </div>
     </div>
 
@@ -162,7 +205,7 @@
             <div id="viz_table">
               <tal:cards  tal:repeat="comment view/get_comments" >
               <div class="comment-card" tal:condition="python:comment['memo']">
-                <div class="card-head" tal:content="python:comment['title']"></div>
+                <div class="card-head" tal:content="structure python:comment['title'].replace('|', '<BR>')"></div>
                 <div class="card-body" tal:content="python:comment['memo']"></div>
               </div>
               </tal:cards>
@@ -173,6 +216,28 @@
 
     <span tal:replace="structure context/@@authenticator/authenticator"/>
 
+
+
+
+    <div id="modal_graph" style="display: none;">
+        <h1>他校や他クラスのグラフを表示</h1>
+        <div class="row add_dialog">
+          <tal:oex tal:repeat="xp context/get_other_experiment">
+           <div class="col-xs-12">
+             <h4><a href="" tal:attributes="href python:view.get_other_link(xp.UID(), '')">${python:xp.__parent__.title} ${xp/year}年度 ${xp/grade} ${xp/klassname}</a></h4>
+             <fieldset>
+               <ul class="tag_btn">
+                <li tal:repeat="xp_g xp/get_valid_group_list_per_exp">
+                  <a href="#" tal:attributes="href python:view.get_other_link(xp.UID(), xp_g)">
+                  ${xp_g}班</a>
+                </li>
+               </ul>
+             </fieldset>
+
+           </div>
+          </tal:oex>
+        </div>
+    </div>
 
 </metal:main_macro>
 </metal:content-core>

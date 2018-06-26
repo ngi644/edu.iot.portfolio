@@ -24,27 +24,28 @@ class IEduIotPortfolioLayer(IDefaultBrowserLayer):
 
 class IPortfolio(model.Schema):
     """
-
+    ポートフォリオのインターフェイス
     """
 
-    year = schema.Int(
-        title=_(u'Year'),
-        required=True,
-    )
-
-    grade = schema.TextLine(
-        title=_(u'Grade'),
-        required=True,
-    )
-
-    klassname = schema.TextLine(
-        title=_(u'Class name'),
-        required=True,
-    )
+    # year = schema.Int(
+    #     title=_(u'Year'),
+    #     required=True,
+    # )
+    #
+    # grade = schema.TextLine(
+    #     title=_(u'Grade'),
+    #     required=True,
+    # )
+    #
+    # klassname = schema.TextLine(
+    #     title=_(u'Class name'),
+    #     required=True,
+    # )
 
 
 class IReport(model.Schema):
     """
+    レポートのインターフェイス
 
     """
 
@@ -53,6 +54,21 @@ class IExperiment(model.Schema):
     """
     実験のインターフェイス
     """
+
+    year = schema.Int(
+        title=_(u'Year'),
+        required=False,
+    )
+
+    grade = schema.TextLine(
+        title=_(u'Grade'),
+        required=False,
+    )
+
+    klassname = schema.TextLine(
+        title=_(u'Class name'),
+        required=False,
+    )
 
     unit = RelationChoice(
         title=_(u"Unit"),
