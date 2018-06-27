@@ -59,21 +59,29 @@
       }
 
     .add_dialog{
-      display: flex;
+      display: block;
       margin: 0.5em;
     }
 
+    .add_dialog > div{
+      border: 1px #ccc solid;
+      border-radius: 10px;
+      margin-bottom: 0.3em;
+    }
+
+
     .tag_btn{
       margin: 0.5em 0;
+      padding: 0;
     }
 
     .tag_btn li{
       list-style: none;
       width: auto;
       display: inline-block;
-      margin: 1.0em 1.5em 0.5em 0;
+      margin: 0.3em 0.7em 0.6em 0;
       border-radius: 5px;
-      padding: 0.5em 0.7em;
+      padding: 0.5em;
       background: #f29a27;
       color: beige;
     }
@@ -225,16 +233,13 @@
           <tal:oex tal:repeat="xp context/get_other_experiment">
            <div class="col-xs-12" tal:define="xpg_list xp/get_valid_group_list_per_exp"
            tal:condition="xpg_list">
-             <h4><a href="" tal:attributes="href python:view.get_other_link(xp.UID(), '')">${python:xp.__parent__.title} ${xp/year}年度 ${xp/grade} ${xp/klassname}</a></h4>
-             <fieldset>
+             <h5><a href="" tal:attributes="href python:view.get_other_link(xp.UID(), '')">${python:xp.__parent__.title} ${xp/year}年度 ${xp/grade} ${xp/klassname}</a></h5>
                <ul class="tag_btn">
                 <li tal:repeat="xp_g xpg_list">
                   <a href="#" tal:attributes="href python:view.get_other_link(xp.UID(), xp_g)">
                   ${xp_g}班</a>
                 </li>
                </ul>
-             </fieldset>
-
            </div>
           </tal:oex>
         </div>
