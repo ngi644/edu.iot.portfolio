@@ -185,12 +185,12 @@
             <a class="plone-btn plone-btn-primary" href=""
               tal:attributes="href string:${context/absolute_url}/measured_view?e=${view/get_experimental_title}"
               tal:condition="view/get_experimental_title">
-              <i class="fa fa-arrow-right" aria-hidden="true"></i>クラスの${view/get_experimental_title}のグラフ
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>自クラスの${view/get_experimental_title}のグラフ
             </a>
           <a class="plone-btn plone-btn-primary" href=""
               tal:attributes="href string:${context/absolute_url}/measured_view"
             tal:condition="not:view/get_experimental_title">
-              <i class="fa fa-arrow-right" aria-hidden="true"></i>クラスの全てのグラフ
+              <i class="fa fa-arrow-right" aria-hidden="true"></i>自クラスの全てのグラフ
           </a>
         </div>
         <div class="col-xs-4">

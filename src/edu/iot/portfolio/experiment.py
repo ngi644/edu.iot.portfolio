@@ -136,6 +136,6 @@ class Experiment(Container):
                                               from_attribute=attribute_name)):
             obj = intids.queryObject(rel.from_id)
             if obj is not None and checkPermission('zope2.View', obj):
-                if obj.id != self.id:
+                if obj.UID() != self.UID():
                     result.append(obj)
         return result
