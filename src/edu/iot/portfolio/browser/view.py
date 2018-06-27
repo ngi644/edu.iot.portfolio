@@ -4,7 +4,7 @@ __author__ = 'nagai'
 
 
 from Products.Five.browser import BrowserView
-from edu.iot.portfolio.interfaces import IExperiment, IMeasuredData
+from edu.iot.portfolio.interfaces import IExperiment, IMeasuredData, IPortfolio
 from zope.interface import implementer
 from zope.interface import implements
 from Products.CMFCore.utils import getToolByName
@@ -25,6 +25,16 @@ def round_harf_even(num, q='.1'):
 
 def step_round(x, base=5):
     return base * round(float(x)/base)
+
+
+@implementer(IPortfolio)
+class PortfolioView(BrowserView):
+    """
+
+    """
+
+    def __init__(self, context, request):
+        super(PortfolioView, self).__init__(context, request)
 
 
 @implementer(IExperiment)

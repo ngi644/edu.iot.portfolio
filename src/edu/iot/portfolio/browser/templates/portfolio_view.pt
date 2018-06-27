@@ -1,0 +1,68 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+
+
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+    <script>
+        require = undefined;
+        define = undefined;
+    </script>
+
+</metal:scripts>
+
+<metal:override fill-slot="top_slot"
+    tal:define="disable_column_one python:request.set('disable_plone.leftcolumn',1);
+                disable_column_two python:request.set('disable_plone.rightcolumn',1);"/>
+
+
+<metal:title fill-slot="content-title">
+  <h1 class="documentFirstHeading" tal:content="context/title"></h1>
+</metal:title>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+    <table class="listing" summary="コンテンツ一覧">
+          <thead>
+            <tr>
+              <th class="nosort">タイトル</th>
+              <th class="nosort">年度</th>
+              <th class="nosort">学年</th>
+              <th class="nosort">クラス</th>
+            </tr>
+          </thead>
+          <tbody>
+          <tr tal:repeat="item python:context.getFolderContents()">
+              <td>
+                <a href="#" title="" tal:attributes="href python:item.getURL()">
+                  ${item/Title}
+                </a>
+              </td>
+              <td>${item/year}</td>
+              <td>${item/grade}</td>
+              <td>${item/klassname}</td>
+          </tr>
+          </tbody>
+    </table>
+
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>

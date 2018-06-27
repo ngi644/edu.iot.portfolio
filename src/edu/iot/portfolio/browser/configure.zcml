@@ -18,6 +18,15 @@
       directory="static"
       />
 
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IPortfolio"
+    name="view"
+    class=".view.PortfolioView"
+    permission="zope2.View"
+    template="templates/portfolio_view.pt"
+    />
+
   <browser:page
     for="edu.iot.portfolio.interfaces.IExperiment"
     name="view"
