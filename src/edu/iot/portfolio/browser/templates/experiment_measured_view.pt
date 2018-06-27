@@ -59,9 +59,8 @@
       }
 
     .add_dialog{
-      display: block;
+      display: inline-block;
       margin: 0.5em;
-      clear: both;
     }
 
     .add_dialog > div{
