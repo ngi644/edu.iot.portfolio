@@ -223,11 +223,12 @@
         <h1>他校や他クラスのグラフを表示</h1>
         <div class="row add_dialog">
           <tal:oex tal:repeat="xp context/get_other_experiment">
-           <div class="col-xs-12">
+           <div class="col-xs-12" tal:define="xpg_list xp/get_valid_group_list_per_exp"
+           tal:condition="xpg_list">
              <h4><a href="" tal:attributes="href python:view.get_other_link(xp.UID(), '')">${python:xp.__parent__.title} ${xp/year}年度 ${xp/grade} ${xp/klassname}</a></h4>
              <fieldset>
                <ul class="tag_btn">
-                <li tal:repeat="xp_g xp/get_valid_group_list_per_exp">
+                <li tal:repeat="xp_g xpg_list">
                   <a href="#" tal:attributes="href python:view.get_other_link(xp.UID(), xp_g)">
                   ${xp_g}班</a>
                 </li>
