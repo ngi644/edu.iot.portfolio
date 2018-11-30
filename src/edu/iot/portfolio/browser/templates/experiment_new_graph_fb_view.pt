@@ -1,0 +1,312 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.0/vis.min.css" />
+
+    <style type="text/css">
+        body, html {
+            font-family: sans-serif;
+        }
+
+        .custom-style1 {
+            fill: #f2ea00;
+            fill-opacity: 0;
+            stroke-width: 2px;
+            stroke: #b3ab00;
+        }
+
+        .custom-style2 {
+            fill: #00b72b;
+            fill-opacity: 0;
+            stroke-width: 2px;
+            stroke: #00b72b;
+        }
+
+        .custom-style3 {
+            fill: #00a0f2;
+            fill-opacity: 0;
+            stroke-width: 2px;
+            stroke: #0016dc;
+        }
+
+        .monitor_panel {
+          width: 45%;
+          background: beige;
+          border-radius: 5px;
+          padding: 0.3em;
+          text-align: center;
+          border: 2px #c1c1ac solid;
+          display: block;
+          float: left;
+          margin-bottom: 0.5em;
+          margin-right: 0.5em;
+        }
+
+        .p_green{
+          background: rgba(248, 240, 224, 0.88);
+          color: black;
+          border: #c1c1ac 1px solid;
+        }
+
+        .p_plane{
+          padding: 0;
+          background: transparent;
+          border: none;
+        }
+    </style>
+
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+    <script>
+        require = undefined;
+        define = undefined;
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vis/4.20.0/vis.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/5.5.2/firebase.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://use.fontawesome.com/539b5348b3.js"></script>
+
+</metal:scripts>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+    <a tal:attributes="href context/absolute_url"><i class="fa fa-arrow-left" aria-hidden="true"></i>実験Top</a>
+
+    <div class="row">
+        <div class="col-xs-6">
+            <h4>リアルタイム表示 [<span id="device_title"></span>]</h4>
+        </div>
+        <div class="col-xs-6">
+            <ul>
+                <li >
+                    実験名: <span tal:content="view/get_experimental_title" id="experimental_title"></span>
+                </li>
+                <li>
+                    班: <span tal:content="view/get_group_num" id="group_num"></span>班
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+
+    <div class="row">
+        <div class="col-xs-4">
+            <div class="monitor_panel p_plane">
+              <button id="btnRecord">計測開始</button><br>
+            </div>
+            <div class="monitor_panel p_green">
+              <span id="rec_status">記録待機中</span>
+            </div>
+        </div>
+        <div class="col-xs-4">
+            <div class="monitor_panel">
+              <span id="timer" style="color:cadetblue; font-size: 14px;">-分 -秒</span>
+            </div>
+            <div class="monitor_panel">
+              <span id ="rec_num" style="color:red; font-size: 14px;">--.- ℃</span>
+            </div>
+        </div>
+        <div class="col-xs-3">
+            <a class="plone-btn plone-btn-large plone-btn-primary pat-plone-modal" href="#modal_save" data-pat-plone-modal="width: 70%"><i class="fa fa-floppy-o" aria-hidden="true"><span>保存</span></a>
+        </div>
+    </div>
+
+    <div id="modal_save" style="display: none;">
+        <h1>記録したデータを保存します</h1>
+        <p>よろしければ「保存」ボタンを押してください．</p>
+        <h4>メモ</h4>
+        <textarea class="memo"></textarea>
+        <p><button id="btnSave" onclick="save()">保存</button></p>
+    </div>
+
+    <div id="visualization"></div>
+
+    <div class="visualClear"><!-- --></div>
+
+    <span tal:replace="structure context/@@authenticator/authenticator"/>
+
+    <div tal:replace="structure view/get_param"><!----></div>
+
+    <script>
+        // Initialize Firebase
+        var config = {
+          apiKey: apiKey,
+          authDomain: authDomain,
+          databaseURL: databaseURL,
+          storageBucket: storageBucket,
+          messagingSenderId: messagingSenderId
+        };
+    </script>
+
+    <script type="text/javascript">
+
+        document.querySelector('#device_title').textContent = device_id;
+
+        firebase.initializeApp(config);
+
+        let container = document.getElementById('visualization');
+        let record_btn = document.getElementById('btnRecord');
+        let save_btn = document.getElementById('btnSave');
+        let rec_status_info = document.getElementById('rec_status');
+
+        let isRecord = false;
+        let timedCount = 0.0;
+        var timerID;
+
+        function intervalTrigger() {
+          return setInterval( function() {
+            timedCount++;
+            document.getElementById('timer').textContent = (timedCount / 60 | 0) +  "分 " + (timedCount % 60) + "秒";
+            //console.log(timedCount);
+          }, 1000 );
+        }
+
+        function record(){
+            if (isRecord === true) {
+                // record Stop
+                isRecord = false;
+                record_btn.textContent = '計測開始';
+                rec_status_info.textContent = '記録待機中';
+                //save_btn.disabled = false;
+                clearInterval(timerID);
+
+            } else {
+                // Record start
+                isRecord = true;
+                record_btn.textContent = '計測停止';
+                rec_status_info.textContent = '記録中';
+                record_data = [];
+                timedCount = 0;
+                timerID = intervalTrigger();
+                //save_btn.disabled = false;
+            }
+        }
+
+        function save(){
+            // Save data
+            let params = new URLSearchParams();
+            let ex_title = document.getElementById('experimental_title').textContent;
+            let g_num = document.getElementById('group_num').textContent;
+            params.append('g', g_num);
+            params.append('e', ex_title);
+            console.log(document.getElementsByClassName('memo')[1].value);
+            params.append('m', document.getElementsByClassName('memo')[1].value);
+            params.append('d', JSON.stringify(record_data));
+            params.append('_authenticator', document.getElementsByName('_authenticator').item(0).value);
+            axios.post('add_graph', params)
+                    .then(response => {
+                        location.href = document.body.getAttribute('data-view-url') + "/measured_view?e=" + ex_title + "&g=" + g_num;
+                    }).catch(error => {
+                        console.log(error);
+                    });
+        }
+
+        record_btn.addEventListener('click', record, false);
+
+        let names = ['温度(c)', '記録データ'];
+        //let names = ['Temperature(c)'];
+
+        let dataset = new vis.DataSet();
+        let record_data = [];
+
+        let groups = new vis.DataSet();
+        groups.add({
+            id: 0,
+            content: names[0],
+            className: 'custom-style1',
+            options: {
+                drawPoints: {
+                    size: 3
+                }
+            }
+        });
+
+        groups.add({
+            id: 1,
+            content: names[1],
+            className: 'custom-style2',
+            options: {
+                drawPoints: {
+                    size: 1
+                }
+            }
+        });
+
+        groups.add({
+            id: 2,
+            content: names[2],
+            className: 'custom-style3',
+            options: {
+                drawPoints: {
+                    size: 1
+                }
+            }
+        });
+
+        let date = new Date();
+        let options = {
+            dataAxis: {
+                showMinorLabels: true,
+                alignZeros: true,
+                left: {
+                    range: { min: 0,
+                        max: 110
+                    }
+                }
+            },
+            width: '100%',
+            height: '450px',
+            legend: { left: { position: "bottom-left" } },
+            start: date.setMinutes(date.getMinutes() - 3),
+            end: date.setMinutes(date.getMinutes() + 30)
+        };
+        let graph2d = new vis.Graph2d(container, dataset, groups, options);
+
+        var ref = firebase.database().ref('Device').child(device_id);
+        ref.limitToLast(10).on('child_added', function(snapshot) {
+            var newData = snapshot.val();
+            addItem(newData.Timestamp, newData.temp, 0);
+            if (isRecord === true){
+                addItem(newData.Timestamp, newData.temp, 1);
+                var v={};
+                v.temp = newData.temp;
+                recordItem(new Date(newData.Timestamp).getTime(), v);
+                document.getElementById('rec_num').textContent = newData.temp + " ℃";
+            }
+            let now = new Date();
+            //graph2d.setWindow(now.setMinutes(now.getMinutes() - 20), now.setMinutes(now.getMinutes() + 22), {animation: false});
+        });
+
+        function addItem(timestamp, value, g) {
+            itm = { x: new Date(timestamp).toLocaleString(), y: value, group: g };
+            dataset.add(itm);
+        }
+        function recordItem(timestamp, value) {
+            record_data.push({timestamp: timestamp, value: value});
+        }
+
+
+
+    </script>
+
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>

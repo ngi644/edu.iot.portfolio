@@ -41,7 +41,6 @@
     name="realtime_view"
     class=".view.ExperimentNewGraphView"
     permission="zope2.View"
-    template="templates/experiment_new_graph_view.pt"
     />
 
   <browser:page

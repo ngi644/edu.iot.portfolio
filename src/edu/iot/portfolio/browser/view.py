@@ -13,6 +13,7 @@ import datetime
 from plone import api
 import decimal
 import urllib
+from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 
 
 def round_harf_even(num, q='.1'):
@@ -53,25 +54,56 @@ class ExperimentNewGraphView(BrowserView):
 
     """
 
+
+    template_mlkcca = ViewPageTemplateFile('templates/experiment_new_graph_view.pt')
+    template_fb = ViewPageTemplateFile('templates/experiment_new_graph_fb_view.pt')
+
     def __init__(self, context, request):
         super(ExperimentNewGraphView, self).__init__(context, request)
+
+    def __call__(self):
+
+        device_uid = self.request.get('uid', '')
+        cloud_type = self.context.get_params(device_uid).get('cloud_type', 'Milkcocoa')
+
+        if cloud_type == 'Firebase':
+            return self.template_fb()
+        else:
+            return self.template_mlkcca()
+
 
     def get_param(self):
         context = self.context
         device_uid = self.request.get('uid', '')
         params = context.get_params(device_uid)
         if params:
-            sc = '''
-            <script type="text/javascript">
-            let app_id = '{}.mlkcca.com';
-            let app_ds = '{}';
-            let app_key = '{}';
-            let app_pass = '{}';
-            let device_id = '{}';
-            </script>
-            '''.format(params['app_id'], params['datastore'],
-                       params['api_key'], params['api_secret'],
-                       params['device_id'])
+            if params['cloud_type'] == 'Milkcocoa':
+                sc = '''
+                <script type="text/javascript">
+                let app_id = '{}.mlkcca.com';
+                let app_ds = '{}';
+                let app_key = '{}';
+                let app_pass = '{}';
+                let device_id = '{}';
+                </script>
+                '''.format(params['app_id'], params['datastore'],
+                           params['api_key'], params['api_secret'],
+                           params['device_id'])
+            if params['cloud_type'] == 'Firebase':
+                sc = '''
+                <script type="text/javascript">
+                let apiKey = '{}';
+                let authDomain = '{}';
+                let databaseURL = '{}';
+                let storageBucket = '{}';
+                let fb_projectId = '{}';
+                let messagingSenderId = '{}';
+                let device_id = '{}';
+                </script>
+                '''.format(params['fb_apiKey'], params['fb_authDomain'],
+                           params['fb_databaseURL'], params['fb_projectId'], params['fb_storageBucket'],
+                           params['fb_messagingSenderId'],
+                           params['device_id'])
             return sc
         return u''
 
