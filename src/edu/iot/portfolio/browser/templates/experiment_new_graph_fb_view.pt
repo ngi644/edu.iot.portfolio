@@ -280,16 +280,16 @@
         var ref = firebase.database().ref('Device').child(device_id);
         ref.limitToLast(10).on('child_added', function(snapshot) {
             var newData = snapshot.val();
-            addItem(newData.Timestamp, newData.temp, 0);
+            var newtime = newData.Timestamp;
+            newtime = newtime.replace(/-/g, '/');
+            addItem(newtime, newData.temp, 0);
             if (isRecord === true){
-                addItem(newData.Timestamp, newData.temp, 1);
+                addItem(newtime, newData.temp, 1);
                 var v={};
                 v.temp = newData.temp;
-                recordItem(new Date(newData.Timestamp).getTime(), v);
+                recordItem(new Date(newtime).getTime(), v);
                 document.getElementById('rec_num').textContent = newData.temp + " ℃";
             }
-            let now = new Date();
-            //graph2d.setWindow(now.setMinutes(now.getMinutes() - 20), now.setMinutes(now.getMinutes() + 22), {animation: false});
         });
 
         function addItem(timestamp, value, g) {
