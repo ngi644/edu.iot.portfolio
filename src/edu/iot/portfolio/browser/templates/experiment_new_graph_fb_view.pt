@@ -273,7 +273,7 @@
             height: '450px',
             legend: { left: { position: "bottom-left" } },
             start: date.setMinutes(date.getMinutes() - 3),
-            end: date.setMinutes(date.getMinutes() + 30)
+            end: date.setMinutes(date.getMinutes() + 20)
         };
         let graph2d = new vis.Graph2d(container, dataset, groups, options);
 
