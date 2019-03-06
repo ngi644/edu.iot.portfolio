@@ -288,7 +288,7 @@
                 var v={};
                 v.temp = newData.temp;
                 recordItem(new Date(newtime).getTime(), v);
-                document.getElementById('rec_num').textContent = newData.temp + " ℃";
+                document.getElementById('rec_num').textContent = newData.temp.toFixed(1) + " ℃";
             }
         });
 

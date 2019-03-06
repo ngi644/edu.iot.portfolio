@@ -85,10 +85,11 @@ class ExperimentNewGraphView(BrowserView):
                 let app_key = '{}';
                 let app_pass = '{}';
                 let device_id = '{}';
+                let device_name = '{}';
                 </script>
                 '''.format(params['app_id'], params['datastore'],
                            params['api_key'], params['api_secret'],
-                           params['device_id'])
+                           params['device_id'], params['device_name'])
             if params['cloud_type'] == 'Firebase':
                 sc = '''
                 <script type="text/javascript">
@@ -99,11 +100,12 @@ class ExperimentNewGraphView(BrowserView):
                 let fb_projectId = '{}';
                 let messagingSenderId = '{}';
                 let device_id = '{}';
+                let device_name = '{}';
                 </script>
                 '''.format(params['fb_apiKey'], params['fb_authDomain'],
                            params['fb_databaseURL'], params['fb_projectId'], params['fb_storageBucket'],
                            params['fb_messagingSenderId'],
-                           params['device_id'])
+                           params['device_id'], params['device_name'])
             return sc
         return u''
 
