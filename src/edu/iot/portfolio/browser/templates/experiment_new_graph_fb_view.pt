@@ -155,7 +155,7 @@
 
     <script type="text/javascript">
 
-        document.querySelector('#device_title').textContent = device_id;
+        document.querySelector('#device_title').textContent = device_name;
 
         firebase.initializeApp(config);
 
