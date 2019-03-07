@@ -138,7 +138,7 @@
             title: '温度(℃)',
             autotick: false,
             ticks: 'outside',
-            range: [-20, 120],
+            range: [0, 120],
             tick0: 0,
             dtick: 20
           }

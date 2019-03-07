@@ -264,7 +264,7 @@
                 showMinorLabels: true,
                 alignZeros: true,
                 left: {
-                    range: { min: -20,
+                    range: { min: 0,
                         max: 110
                     }
                 }
