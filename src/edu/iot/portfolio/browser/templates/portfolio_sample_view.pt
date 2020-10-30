@@ -1,0 +1,72 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      metal:use-macro="here/main_template/macros/master"
+      i18n:domain="plone">
+
+<body>
+
+
+<metal:style fill-slot="style_slot">
+
+
+
+</metal:style>
+
+<metal:scripts fill-slot="javascript_head_slot"
+	tal:define="navroot context/@@plone_portal_state/navigation_root_url">
+
+    <script>
+        require = undefined;
+        define = undefined;
+    </script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <script type="text/javascript">
+
+        function search_key(){
+            // Search data
+            let params = new URLSearchParams();
+            let keyword = document.getElementById('keyword').value;
+            params.append('key', keyword);
+            params.append('_authenticator', document.getElementsByName('_authenticator').item(0).value);
+            axios.post(document.body.getAttribute('data-view-url') + '/search_key_view', params)
+                    .then(response => {
+                        console.log(response.data);
+                        document.getElementById('results').innerHTML = response.data;
+                    }).catch(error => {
+                        console.log(error);
+                    });
+        }
+
+    </script>
+
+
+</metal:scripts>
+
+
+<metal:title fill-slot="content-title">
+  <h1 class="documentFirstHeading" tal:content="context/title"></h1>
+</metal:title>
+
+<metal:content-core fill-slot="content-core">
+<metal:main_macro define-macro="content-core">
+
+  <span tal:replace="structure context/@@authenticator/authenticator"/>
+
+  <div>
+    <input id="keyword"></input>
+    <button id="btnSearch" onclick="search_key()">検索</button>
+  </div>
+
+  <div id="results">
+    <!-- ここにレンダリング-->
+  </div>
+
+</metal:main_macro>
+</metal:content-core>
+
+</body>
+</html>

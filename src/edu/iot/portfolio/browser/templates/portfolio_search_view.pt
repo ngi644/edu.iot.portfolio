@@ -1,0 +1,36 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en"
+      xmlns:tal="http://xml.zope.org/namespaces/tal"
+      xmlns:metal="http://xml.zope.org/namespaces/metal"
+      xmlns:i18n="http://xml.zope.org/namespaces/i18n"
+      lang="en"
+      i18n:domain="plone">
+
+  <div>
+  
+    <table class="listing" summary="コンテンツ一覧">
+            <thead>
+              <tr>
+                <th class="nosort">タイトル</th>
+                <th class="nosort">年度</th>
+                <th class="nosort">学年</th>
+                <th class="nosort">クラス</th>
+              </tr>
+            </thead>
+            <tbody>
+            <tr tal:repeat="item python:view.search_keyword()">
+                <td>
+                  <a href="#" title="" tal:attributes="href python:item.getURL()">
+                    ${item/Title}
+                  </a>
+                </td>
+                <td>${item/year}</td>
+                <td>${item/grade}</td>
+                <td>${item/klassname}</td>
+            </tr>
+            </tbody>
+      </table>
+
+  </div>
+
+  
+</html>

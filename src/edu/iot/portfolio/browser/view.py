@@ -289,3 +289,6 @@ class MeasuredDataView(BrowserView):
     def __init__(self, context, request):
         super(MeasuredDataView, self).__init__(context, request)
 
+
+
+

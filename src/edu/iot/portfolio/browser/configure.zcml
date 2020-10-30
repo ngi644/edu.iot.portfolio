@@ -67,4 +67,20 @@
     />
 
 
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IPortfolio"
+    name="sample_view"
+    class=".view_sample.PortfolioSampleView"
+    permission="zope2.View"
+    template="templates/portfolio_sample_view.pt"
+    />
+
+  <browser:page
+    for="edu.iot.portfolio.interfaces.IPortfolio"
+    name="search_key_view"
+    class=".view_sample.PortfolioSearchView"
+    permission="zope2.View"
+    template="templates/portfolio_search_view.pt"
+    />
+
 </configure>
